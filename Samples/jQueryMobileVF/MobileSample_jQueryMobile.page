@@ -1,0 +1,160 @@
+<apex:page docType="html-5.0"
+	       showHeader="false" sidebar="false"
+		   standardController="Contact">
+     <!--          
+	<apex:stylesheet value="{!URLFOR($Resource.jQueryMobile130, 'jquery.mobile-1.3.0/jquery.mobile-1.3.0.min.css')}" />
+	<apex:includeScript value="{!$Resource.jquery_1_8_0}"/>
+	<apex:includeScript value="{!URLFOR($Resource.jQueryMobile130, 'jquery.mobile-1.3.0/jquery.mobile-1.3.0.min.js')}"/>
+	<apex:includeScript value="{!$Resource.ForceTk}"/>
+    -->           
+	<apex:stylesheet value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.css')}"/>
+	<apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery-1.9.1.js')}"/>
+	<apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.js')}"/>
+	<apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'ForceTk.js')}"/>
+    <head>
+		<title>Contacts</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <script type="text/javascript">
+            var $j = jQuery.noConflict(); 
+            var contactRecs = new Array();
+            
+        	var restAPIClient = new forcetk.Client();  
+		    restAPIClient.setSessionToken('{!$Api.Session_ID}');
+            
+            $j(document).ready(function() {
+            	regBtnClickHandlers();
+                getAllContacts();
+            });
+            
+            function getAllContacts(){
+                $j.mobile.showPageLoadingMsg();
+                var q = "select id, firstName, lastName, phone from Contact order by FirstName";
+                restAPIClient.query(q , 
+                            function(response) { 
+                                   showContacts(response.records); 
+                                }); 
+            }
+            
+            function showContacts(records) {    
+                $j('#cList').empty();
+                contactRecs.length = 0;
+                
+                
+                for(var i = 0; i < records.length; i++) { contactRecs[records[i].Id] = records[i]; }
+                var x = 0;
+                $j.each(records,
+                    function() {
+                    var newLi = $j('<li></li>');
+                                
+                    var newLink = $j('<a id="' +this.Id+ '" data-transition="flip">' +this.FirstName+ ' '+this.LastName+ '</a>');
+                    newLink.click(function(e) {
+                        e.preventDefault();
+                        $j.mobile.showPageLoadingMsg();
+                        $j('#fName').val(contactRecs[this.id].FirstName);
+                        $j('#lName').val(contactRecs[this.id].LastName);
+                        $j('#phone').val(contactRecs[this.id].Phone);
+                        $j('#contactId').val(contactRecs[this.id].Id);
+                        $j('#error').html('');
+                       
+                        $j.mobile.changePage('#detailpage', {changeHash: true});
+                    });
+                    newLi.append(newLink);            
+                    newLi.appendTo('#cList');
+                    x++;
+                  });
+                
+                $j.mobile.hidePageLoadingMsg();
+                $j('#cList').listview('refresh');
+            }      
+        
+            function addUpdateContact(e){
+                e.preventDefault();
+                var cId = $j('#contactId').val();
+                var contact = { FirstName : $j('#fName').val(),
+                                LastName : $j('#lName').val(),
+                                Phone : $j('#phone').val()};
+                if (cId === 'undefined' || cId === ''){
+                    restAPIClient.create('Contact', contact, sucessCallback, displayError); 
+                } else {
+                    restAPIClient.update('Contact', cId, contact, sucessCallback, displayError); 
+                }
+            }
+        
+            function deleteContact(e){
+                e.preventDefault();
+                restAPIClient.del('Contact', $j('#contactId').val(), sucessCallback, displayError);
+            }
+            
+            function sucessCallback(r){
+                getAllContacts();
+                $j.mobile.changePage('#listpage', {changeHash: true});
+            }
+        
+            function displayError(e){
+                var error = JSON.parse(e.responseText);
+                $j('#error').html(error[0].message);
+            }
+        
+            function regBtnClickHandlers() {
+                $j('#add').click(function(e) {
+                    e.preventDefault();
+                    $j.mobile.showPageLoadingMsg();
+                    $j('#fName').val('');
+                    $j('#lName').val('');
+                    $j('#phone').val('');
+                    $j('#error').html('');
+                    $j('#contactId').val('');
+                    $j.mobile.changePage('#detailpage', {changeHash: true});
+                    $j.mobile.hidePageLoadingMsg();            
+                });
+        
+                $j('#save').click(function(e) {
+                   addUpdateContact(e);
+                });
+        
+                $j('#delete').click(function(e) {
+                   deleteContact(e);
+                });
+            }
+		</script>    
+	</head>
+
+    <body>    
+        <div data-role="page" data-theme="b" id="listpage">                
+            <div data-role="header" data-position="fixed">
+                <h2>Contacts</h2>
+	            <a href='#' id="add" class='ui-btn-right' data-icon='add' data-theme="b">Add</a>
+            </div>
+            <div data-role="content" id="contactList">            
+                <ul id="cList" data-filter="true" data-inset="true" data-role="listview" 
+                    data-theme="c" data-dividertheme="b">
+                </ul>
+            </div>
+        </div>
+        
+        <div data-role="page" data-theme="b" id="detailpage">
+            <div data-role="header" data-position="fixed">
+                <a href='#listpage' id="back2ContactList" class='ui-btn-left' data-icon='arrow-l' data-direction="reverse" data-transition="flip">Back</a>
+                <h1>Contact Details</h1>
+            </div>
+            <div data-role="content">
+				<div data-role="fieldcontain">
+					<label for="fName">First Name:</label>
+					<input name="fName" id="fName" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="lName">Last Name:</label>
+					<input name="lName" id="lName" />
+				</div>
+				<div data-role="fieldcontain">
+					<label for="phone">Phone:</label>
+					<input name="phone" id="phone"/>
+				</div>
+				<h2 style="color:red" id="error"></h2><br/>
+                <input type="hidden" id="contactId" />
+				<button id="save" data-role="button" data-icon="check" data-inline="true" data-theme="b" class="save">Save</button>
+				<button id="delete" data-role="button" data-icon="delete" data-inline="true" class="destroy">Delete</button>
+            </div>    
+        </div>  
+    </body>    
+</apex:page>
