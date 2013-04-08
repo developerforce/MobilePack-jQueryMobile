@@ -18,16 +18,20 @@
 * `Samples/jQueryMobileHerokuNode` - a sample mobile web app that can be deployed outside of Force.com (and for this example deploys to Heroku). It serves up the same single page contact management app that uses the ForceTK library as a JavaScript wrapper for the Force.com REST API to grab your data and communicates back to the Salesforce Platform via a Node.js proxy.
 
 <p align='center'>
-# jQuery Mobile and Visualforce
+### jQuery Mobile and Visualforce
+<center>
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngYi&oid=00D000000000062&lastMod=1365458345000" />
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngYn&oid=00D000000000062&lastMod=1365458383000" />
+</center>
 	
-#jQuery Mobile and Heroku
+### jQuery Mobile and Heroku
+<center>
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngYs&oid=00D000000000062&lastMod=1365458426000" />
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngYx&oid=00D000000000062&lastMod=1365458490000" />
-<center>
+
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngZ2&oid=00D000000000062&lastMod=1365458521000" />
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngZ7&oid=00D000000000062&lastMod=1365458558000" />
+</center>
  
 ## Learn More
 
