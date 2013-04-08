@@ -3,6 +3,7 @@
  */
 
 var client_id = process.env.client_id;
+var app_url = process.env.app_url;
 
 var express = require('express')
     , http = require('http')
@@ -30,11 +31,11 @@ app.configure('development', function () {
 });
 
 app.get('/', function(req, res) {
-  res.render('index', { client_id: client_id });
+  res.render('index', { client_id: client_id, app_url: app_url });
 });
 
 app.get('/index.html', function(req, res) {
-  res.render('index', { client_id: client_id });
+  res.render('index', { client_id: client_id, app_url: app_url });
 });
 
 app.all('/proxy/?*', function (req, res) {
