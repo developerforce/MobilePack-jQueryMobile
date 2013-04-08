@@ -28,7 +28,6 @@
 <center>
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngYs&oid=00D000000000062&lastMod=1365458426000" />
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngYx&oid=00D000000000062&lastMod=1365458490000" />
-
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngZ2&oid=00D000000000062&lastMod=1365458521000" />
 	<img src="http://c.na1.content.force.com/servlet/servlet.ImageServer?id=01530000002ngZ7&oid=00D000000000062&lastMod=1365458558000" />
 </center>
