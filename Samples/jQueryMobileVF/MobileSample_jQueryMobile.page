@@ -1,28 +1,22 @@
 <apex:page docType="html-5.0"
-	       showHeader="false" sidebar="false"
-		   standardController="Contact">
-     <!--          
-	<apex:stylesheet value="{!URLFOR($Resource.jQueryMobile130, 'jquery.mobile-1.3.0/jquery.mobile-1.3.0.min.css')}" />
-	<apex:includeScript value="{!$Resource.jquery_1_8_0}"/>
-	<apex:includeScript value="{!URLFOR($Resource.jQueryMobile130, 'jquery.mobile-1.3.0/jquery.mobile-1.3.0.min.js')}"/>
-	<apex:includeScript value="{!$Resource.ForceTk}"/>
-    -->           
-	<apex:stylesheet value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.css')}"/>
-	<apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery-1.9.1.js')}"/>
-	<apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.js')}"/>
-	<apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'ForceTk.js')}"/>
+           showHeader="false" sidebar="false"
+           standardController="Contact">          
+    <apex:stylesheet value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery-1.9.1.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'ForceTk.js')}"/>
     <head>
-		<title>Contacts</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Contacts</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <script type="text/javascript">
             var $j = jQuery.noConflict(); 
             var contactRecs = new Array();
             
-        	var restAPIClient = new forcetk.Client();  
-		    restAPIClient.setSessionToken('{!$Api.Session_ID}');
+            var restAPIClient = new forcetk.Client();
+            restAPIClient.setSessionToken('{!$Api.Session_ID}');
             
             $j(document).ready(function() {
-            	regBtnClickHandlers();
+                regBtnClickHandlers();
                 getAllContacts();
             });
             
@@ -116,14 +110,14 @@
                    deleteContact(e);
                 });
             }
-		</script>    
-	</head>
+        </script>    
+    </head>
 
     <body>    
         <div data-role="page" data-theme="b" id="listpage">                
             <div data-role="header" data-position="fixed">
                 <h2>Contacts</h2>
-	            <a href='#' id="add" class='ui-btn-right' data-icon='add' data-theme="b">Add</a>
+                <a href='#' id="add" class='ui-btn-right' data-icon='add' data-theme="b">Add</a>
             </div>
             <div data-role="content" id="contactList">            
                 <ul id="cList" data-filter="true" data-inset="true" data-role="listview" 
@@ -138,22 +132,22 @@
                 <h1>Contact Details</h1>
             </div>
             <div data-role="content">
-				<div data-role="fieldcontain">
-					<label for="fName">First Name:</label>
-					<input name="fName" id="fName" />
-				</div>
-				<div data-role="fieldcontain">
-					<label for="lName">Last Name:</label>
-					<input name="lName" id="lName" />
-				</div>
-				<div data-role="fieldcontain">
-					<label for="phone">Phone:</label>
-					<input name="phone" id="phone"/>
-				</div>
-				<h2 style="color:red" id="error"></h2><br/>
+                <div data-role="fieldcontain">
+                    <label for="fName">First Name:</label>
+                    <input name="fName" id="fName" />
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="lName">Last Name:</label>
+                    <input name="lName" id="lName" />
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="phone">Phone:</label>
+                    <input name="phone" id="phone"/>
+                </div>
+                <h2 style="color:red" id="error"></h2><br/>
                 <input type="hidden" id="contactId" />
-				<button id="save" data-role="button" data-icon="check" data-inline="true" data-theme="b" class="save">Save</button>
-				<button id="delete" data-role="button" data-icon="delete" data-inline="true" class="destroy">Delete</button>
+                <button id="save" data-role="button" data-icon="check" data-inline="true" data-theme="b" class="save">Save</button>
+                <button id="delete" data-role="button" data-icon="delete" data-inline="true" class="destroy">Delete</button>
             </div>    
         </div>  
     </body>    
