@@ -43,7 +43,11 @@ From jQuery-swip - http://code.google.com/p/jquery-swip/source/browse/trunk/jque
 -->
 <script type="text/javascript" src="jquery.popup.js"></script>
 <script type="text/javascript" src="jquerymobile.js"></script>
-<script type="text/javascript" src="forcetk.js"></script>
+<script type="text/javascript" src="cordova.force.js"></script>
+<script type="text/javascript" src="backbone/underscore-1.4.4.min.js"></script>
+<script type="text/javascript" src="force.entity.js"></script>
+<script type="text/javascript" src="forcetk.mobilesdk.js"></script>
+<script type="text/javascript" src="SObjectData.js"></script>
 <script type="text/javascript" src="mobileapp.js"></script>
 <script type="text/javascript">
 // OAuth Configuration

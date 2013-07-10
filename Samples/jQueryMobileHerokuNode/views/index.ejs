@@ -37,25 +37,30 @@ an HTML5 mobile app using jQuery Mobile
     For development, you may want to load jQuery/jQuery Mobile from their CDN. 
 -->
 <link rel="stylesheet" href="jquery.mobile-1.3.0.min.css" />
-<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
 <!--
 From jQuery-swip - http://code.google.com/p/jquery-swip/source/browse/trunk/jquery.popupWindow.js 
 -->
 <script type="text/javascript" src="jquery.popup.js"></script>
 <script type="text/javascript" src="jquerymobile.js"></script>
-<script type="text/javascript" src="forcetk.js"></script>
+<script type="text/javascript" src="cordova.force.js"></script>
+<script type="text/javascript" src="backbone/underscore-1.4.4.min.js"></script>
+<script type="text/javascript" src="force.entity.js"></script>
+<script type="text/javascript" src="forcetk.mobilesdk.js"></script>
+<script type="text/javascript" src="SObjectData.js"></script>
 <script type="text/javascript" src="mobileapp.js"></script>
 <script type="text/javascript">
 // OAuth Configuration
 var loginUrl    = 'https://login.salesforce.com/';
 var clientId    = '<%- client_id %>'; //demo only
 
-var redirectUri = '<%- app_url %>/index.html';
-var proxyUrl = '<%- app_url %>/proxy/';
+var redirectUri = '<%- app_url %>';
+var proxyUrl = '<%- app_url %>proxy/';
 
 // We'll get an instance of the REST API client in a callback after we do 
 // OAuth
 var client = new forcetk.Client(clientId, loginUrl, proxyUrl);
+Force.init(null,null,client,null);
 
 // We use $j rather than $ for jQuery
 if (window.$j === undefined) {

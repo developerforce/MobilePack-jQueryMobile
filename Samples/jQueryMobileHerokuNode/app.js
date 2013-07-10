@@ -4,6 +4,7 @@
 
 var client_id = process.env.client_id;
 var app_url = process.env.app_url;
+console.log(app_url);
 
 var express = require('express')
     , http = require('http')

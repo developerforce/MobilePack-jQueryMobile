@@ -30,18 +30,21 @@
   * See mobile.html for code required to run this on your own server
   */
 
+var Contacts = new SObjectData();
 function errorCallback(jqXHR){
     console.log(jqXHR.statusText + ": " + jqXHR.responseText);
 }
 
 function addClickListeners() {
-    $j('#newbtn').click(function(e) {
+    $j('#actionbtn').click(syncHandler);
+	
+	$j('#newbtn').click(function(e) {
         // Show the 'New Account' form
         e.preventDefault();
         $j('#form')[0].reset();
         $j('#formheader').html('New Contact');
         setButtonText('#actionbtn', 'Create');
-        $j('#actionbtn').unbind('click.btn').bind('click.btn', createHandler);
+		Contacts.dataObject = null;
         $j.mobile.changePage( "#editpage" , { reverse: false, changeHash: false } );
     });
 
@@ -49,119 +52,84 @@ function addClickListeners() {
         // Delete the account
         e.preventDefault();
         $j.mobile.loading( "show", { text: 'Loading', textVisible: true } );
-        client.del('Contact', $j('#detail').find('#Id').val()
-        ,
-        function(response) {
-            getRecords(function() {
-                $j.mobile.loading( "hide");
-                $j.mobile.changePage( "#mainpage" , { reverse: false, changeHash: false } );
-            });
-        }, errorCallback);
+        Contacts.remove(Contacts.dataObject,function() {
+			getRecords();
+			$j.mobile.loading("hide");
+            $j.mobile.changePage( "#mainpage" , { reverse: false, changeHash: true } );
+		});
     });
 
     $j('#editbtn').click(function(e) {
         // Get account fields and show the 'Edit Account' form
         e.preventDefault();
         $j.mobile.loading( "show", { text: 'Loading', textVisible: true } );
-        client.retrieve("Contact", $j('#detail').find('#Id').val()
-        , "Name,FirstName,LastName,Id,Email",
-        function(response) {
-            $j('#form').find('input').each(function() {
-                $j(this).val(response[$j(this).attr("name")]);
-            });
-            $j('#formheader').html('Edit Contact');
-            setButtonText('#actionbtn', 'Update');
-            $j('#actionbtn')
-            .unbind('click.btn')
-            .bind('click.btn', updateHandler);
-            $j.mobile.loading( "hide");
-            $j.mobile.changePage( "#editpage" , { reverse: false, changeHash: false } );
-        }, errorCallback);
-    });
+		
+		$j('input#FirstName').val(Contacts.dataObject.FirstName);
+		$j('input#LastName').val(Contacts.dataObject.LastName);
+        $j('input#Email').val(Contacts.dataObject.Email);
+        $j('input#Id').val(Contacts.dataObject.Id);
+		
+        $j('#formheader').html('Edit Contact');
+        setButtonText('#actionbtn', 'Update');
+        $j.mobile.loading( "hide");
+        $j.mobile.changePage( "#editpage" , { reverse: false, changeHash: false } );
+        });
 }
 
 // Populate the list and set up click handling
 function getRecords(callback) {
 	console.log('In getRecords');
     $j('#list').empty();
-    client.query("SELECT Id, Name, FirstName, LastName FROM Contact ORDER BY Name LIMIT 20"
-    ,
-    function(response) {
-		console.log('recieved'+response.records);
-        $j.each(response.records,
+    Contacts.fetch("soql","SELECT Id, FirstName, LastName, Email FROM Contact ORDER BY Name LIMIT 20",
+    function() {
+		$j.each(Contacts.data(),
         function() {
             var id = this.Id;
-            $j('<li></li>')
-            .hide()
-            .append('<a><h2>' + this.Name + '</h2></a>')
-            .click(function(e) {
+            var newLi = $j('<li></li>');
+			var newLink = $j('<a id="' +this.Id+ '" data-transition="flip">' +this.FirstName+ ' '+this.LastName+ '</a>')
+			.click(function(e) {
                 e.preventDefault();
-                $j.mobile.loading( "show", { text: 'Loading', textVisible: true } );
-                client.retrieve("Contact", id, "Name,FirstName,LastName,Id,Email"
-                ,
-                function(response) {
-                    $j('#Name').html(response.Name);
-					$j('#FirstName').html(response.FirstName);
-					$j('#LastName').html(response.LastName);
-                    $j('#Email').html(response.Email);
-                    $j('#Id').val(response.Id);
-                    $j.mobile.loading("hide");
-                    $j.mobile.changePage( "#detailpage" , { reverse: false, changeHash: true } );
-                }, errorCallback);
-            })
-            .appendTo('#list')
-            .show();
+				Contacts.dataObject = Contacts.findRecordById([this.id]);
+			 	$j.mobile.loading( "show", { text: 'Loading', textVisible: true } );
+                $j('#FirstName').html(Contacts.dataObject.FirstName);
+				$j('#LastName').html(Contacts.dataObject.LastName);
+                $j('#Email').html(Contacts.dataObject.Email);
+                $j('#Id').val(Contacts.dataObject.Id);
+                $j.mobile.loading("hide");
+                $j.mobile.changePage( "#detailpage" , { reverse: false, changeHash: true } );
+                });
+           		newLi.append(newLink);            
+                newLi.appendTo('#list');
         });
-
-        $j('#list').listview('refresh');
-
-        if (typeof callback != 'undefined' && callback != null) {
-            callback();
-        }
-    }, errorCallback);
+		$j('input#FirstName').val();
+		$j('input#LastName').val();
+        $j('input#Email').val();
+        $j('input#Id').val();
+		$j.mobile.loading( "hide" );
+		$j('#list').listview('refresh');
+	});
 }
 
-// Gather fields from the account form and create a record
-function createHandler(e) {
-    e.preventDefault();
-    var form = $j('#form');
-    var fields = {};
-    form.find('input').each(function() {
-        var child = $j(this);
-        if (child.val().length > 0 && child.attr("name") != 'Id') {
-            fields[child.attr("name")] = child.val();
-        }
-    });
-    $j.mobile.loading( "show", { text: 'Loading', textVisible: true } );
-    client.create('Contact', fields,
-    function(response) {
-        getRecords(function() {
-            $j.mobile.loading( "hide" );
-            $j.mobile.changePage( "#mainpage" , { reverse: false, changeHash: false } );
-        });
-    }, errorCallback);
-}
 
-// Gather fields from the account form and update a record
-function updateHandler(e) {
+// Gather fields from the contact form and update a record
+function syncHandler(e) {
     e.preventDefault();
+	console.log('In Sync, Create or Update?	');
     var form = $j('#form');
-    var fields = {};
-    form.find('input').each(function() {
-        var child = $j(this);
-        if (child.val().length > 0 && child.attr("name") != 'Id') {
-            fields[child.attr("name")] = child.val();
-        }
-    });
     $j.mobile.loading( "show", { text: 'Loading', textVisible: true } );
-    client.update('Contact', form.find('#Id').val(), fields
-    ,
-    function(response) {
-        getRecords(function() {
-            $j.mobile.loading( "hide");
-            $j.mobile.changePage( "#mainpage" , { reverse: false, changeHash: false } );
-        });
-    }, errorCallback);
+	var record = Contacts.create();
+	if(Contacts.dataObject != null) { record = Contacts.dataObject; } 
+	record.FirstName = $j('input#FirstName').val();
+	record.LastName = $j('input#LastName').val();
+	record.Email = $j('input#Email').val();
+	
+	console.log('record created::::');
+	console.log(record);
+	Contacts.sync(record,function() {
+		getRecords();
+		$j.mobile.loading("hide");
+        $j.mobile.changePage( "#mainpage" , { reverse: false, changeHash: true } );
+	});
 }
 
 // Ugh - this is required to change text on a jQuery Mobile button
