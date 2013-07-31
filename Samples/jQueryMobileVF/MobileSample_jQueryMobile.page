@@ -4,39 +4,37 @@
     <apex:stylesheet value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.css')}"/>
     <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery-1.9.1.min.js')}"/>
     <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'jquery.mobile-1.3.0.min.js')}"/>
-    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'ForceTk.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'cordova.force.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'backbone/underscore-1.4.4.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'force.entity.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.MobileSample_Resources_jQueryMobile, 'SObjectData.js')}"/>
     <head>
         <title>Contacts</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <c:RemoteTK />
+        
         <script type="text/javascript">
             var $j = jQuery.noConflict(); 
-            var contactRecs = new Array();
+            var client = new remotetk.Client();
+            Force.init(null,null,client,null);
             
-            var restAPIClient = new forcetk.Client();
-            restAPIClient.setSessionToken('{!$Api.Session_ID}');
+            var Contacts = new SObjectData();
+            Contacts.errorHandler = displayError;
             
             $j(document).ready(function() {
                 regBtnClickHandlers();
                 getAllContacts();
             });
             
-            function getAllContacts(){
-                $j.mobile.showPageLoadingMsg();
-                var q = "select id, firstName, lastName, phone from Contact order by FirstName";
-                restAPIClient.query(q , 
-                            function(response) { 
-                                   showContacts(response.records); 
-                                }); 
+            function getAllContacts() {
+                Contacts.fetch('soql','SELECT id, firstName, lastName, phone from Contact LIMIT 100',function() {
+                    showContacts(Contacts.data());
+                });
             }
-            
+
             function showContacts(records) {    
                 $j('#cList').empty();
-                contactRecs.length = 0;
-                
-                
-                for(var i = 0; i < records.length; i++) { contactRecs[records[i].Id] = records[i]; }
-                var x = 0;
-                $j.each(records,
+                $j.each(Contacts.data(),
                     function() {
                     var newLi = $j('<li></li>');
                                 
@@ -44,17 +42,17 @@
                     newLink.click(function(e) {
                         e.preventDefault();
                         $j.mobile.showPageLoadingMsg();
-                        $j('#fName').val(contactRecs[this.id].FirstName);
-                        $j('#lName').val(contactRecs[this.id].LastName);
-                        $j('#phone').val(contactRecs[this.id].Phone);
-                        $j('#contactId').val(contactRecs[this.id].Id);
+                        $j('#fName').val(Contacts.findRecordById([this.id]).FirstName);
+                        $j('#lName').val(Contacts.findRecordById([this.id]).LastName);
+                        $j('#phone').val(Contacts.findRecordById([this.id]).Phone);
+                        $j('#contactId').val(Contacts.findRecordById([this.id]).Id);
                         $j('#error').html('');
                        
                         $j.mobile.changePage('#detailpage', {changeHash: true});
                     });
                     newLi.append(newLink);            
                     newLi.appendTo('#cList');
-                    x++;
+                  //  x++;
                   });
                 
                 $j.mobile.hidePageLoadingMsg();
@@ -64,29 +62,29 @@
             function addUpdateContact(e){
                 e.preventDefault();
                 var cId = $j('#contactId').val();
-                var contact = { FirstName : $j('#fName').val(),
-                                LastName : $j('#lName').val(),
-                                Phone : $j('#phone').val()};
-                if (cId === 'undefined' || cId === ''){
-                    restAPIClient.create('Contact', contact, sucessCallback, displayError); 
-                } else {
-                    restAPIClient.update('Contact', cId, contact, sucessCallback, displayError); 
-                }
+                var record = Contacts.findRecordById(cId);
+                if(record == null) { //new record
+                    record = Contacts.create();
+                } 
+                record.FirstName = $j('#fName').val();
+                record.LastName = $j('#lName').val();
+                record.Phone = $j('#phone').val();
+                Contacts.sync(record,successCallback);
             }
         
             function deleteContact(e){
                 e.preventDefault();
-                restAPIClient.del('Contact', $j('#contactId').val(), sucessCallback, displayError);
+                Contacts.remove(Contacts.findIndexById($j('#contactId').val()),successCallback);
             }
             
-            function sucessCallback(r){
+            function successCallback(r){
                 getAllContacts();
                 $j.mobile.changePage('#listpage', {changeHash: true});
             }
         
             function displayError(e){
-                var error = JSON.parse(e.responseText);
-                $j('#error').html(error[0].message);
+                console.log(e);
+                $j('#error').html(e[0].message);
             }
         
             function regBtnClickHandlers() {
