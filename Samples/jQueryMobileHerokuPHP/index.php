@@ -59,6 +59,7 @@ var proxyUrl    = '<?=$_ENV['app_url']?>/proxy.php?mode=native';
 // We'll get an instance of the REST API client in a callback after we do 
 // OAuth
 var client = new forcetk.Client(clientId, loginUrl, proxyUrl);
+Force.init(null,null,client,null);
 
 // We use $j rather than $ for jQuery
 if (window.$j === undefined) {
